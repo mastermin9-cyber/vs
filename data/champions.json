@@ -1,0 +1,542 @@
+{
+    "Aatrox": {
+        "id": "Aatrox",
+        "name": "아트록스",
+        "role": "탑",
+        "type": "브루저",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 6, "mid": 8, "late": 5,
+            "sustain": 8, "burst": 5, "dps": 6,
+            "cc": 6, "mobility": 5, "tankiness": 7, "utility": 3
+        },
+        "strengths": ["높은 체력 회복", "강력한 광역 CC", "라인 푸시력"],
+        "weaknesses": ["치유 감소에 취약", "스킬 의존적", "후반 약세"],
+        "powerSpikes": ["레벨 3", "레벨 6", "이클립스"],
+        "counters": ["Fiora", "Irelia", "Riven"],
+        "goodAgainst": ["Malphite", "Ornn", "Garen"]
+    },
+    "Ahri": {
+        "id": "Ahri",
+        "name": "아리",
+        "role": "미드",
+        "type": "메이지",
+        "damageType": "AP",
+        "rangeType": "원거리",
+        "stats": {
+            "early": 5, "mid": 7, "late": 7,
+            "sustain": 4, "burst": 7, "dps": 5,
+            "cc": 6, "mobility": 8, "tankiness": 3, "utility": 5
+        },
+        "strengths": ["높은 기동력", "안정적인 CC", "로밍 능력"],
+        "weaknesses": ["낮은 DPS", "스킬샷 의존", "하드캐리 어려움"],
+        "powerSpikes": ["레벨 6", "루덴의 폭풍 완성", "레벨 11"],
+        "counters": ["Kassadin", "Yasuo", "Fizz"],
+        "goodAgainst": ["Vex", "Syndra", "Viktor"]
+    },
+    "Akali": {
+        "id": "Akali",
+        "name": "아칼리",
+        "role": "미드",
+        "type": "암살자",
+        "damageType": "AP",
+        "rangeType": "근접",
+        "stats": {
+            "early": 4, "mid": 8, "late": 7,
+            "sustain": 4, "burst": 9, "dps": 6,
+            "cc": 2, "mobility": 9, "tankiness": 3, "utility": 2
+        },
+        "strengths": ["극강의 기동력", "높은 폭딜", "은신 활용"],
+        "weaknesses": ["초반 라인전 약세", "CC에 취약", "에너지 관리"],
+        "powerSpikes": ["레벨 6", "마법공학 로켓벨트", "레벨 11"],
+        "counters": ["Galio", "Kassadin", "LeBlanc"],
+        "goodAgainst": ["Lux", "Viktor", "Orianna"]
+    },
+    "Camille": {
+        "id": "Camille",
+        "name": "카밀",
+        "role": "탑",
+        "type": "브루저",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 5, "mid": 7, "late": 8,
+            "sustain": 4, "burst": 7, "dps": 7,
+            "cc": 5, "mobility": 8, "tankiness": 5, "utility": 4
+        },
+        "strengths": ["강력한 후반", "높은 기동력", "고정 피해"],
+        "weaknesses": ["초반 라인전 약세", "짧은 교전에 불리", "스킬 의존"],
+        "powerSpikes": ["레벨 6", "삼위일체", "레벨 16"],
+        "counters": ["Jax", "Darius", "Renekton"],
+        "goodAgainst": ["Garen", "Malphite", "Ornn"]
+    },
+    "Darius": {
+        "id": "Darius",
+        "name": "다리우스",
+        "role": "탑",
+        "type": "브루저",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 9, "mid": 7, "late": 4,
+            "sustain": 6, "burst": 7, "dps": 7,
+            "cc": 5, "mobility": 3, "tankiness": 7, "utility": 3
+        },
+        "strengths": ["최강 초반 라인전", "출혈 스택 압박", "궁극기 리셋"],
+        "weaknesses": ["기동력 부족", "카이팅에 취약", "후반 약세"],
+        "powerSpikes": ["레벨 1", "레벨 6", "삼위일체"],
+        "counters": ["Vayne", "Quinn", "Teemo"],
+        "goodAgainst": ["Garen", "Nasus", "Malphite"]
+    },
+    "Fiora": {
+        "id": "Fiora",
+        "name": "피오라",
+        "role": "탑",
+        "type": "전사",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 6, "mid": 7, "late": 9,
+            "sustain": 6, "burst": 6, "dps": 8,
+            "cc": 3, "mobility": 7, "tankiness": 4, "utility": 2
+        },
+        "strengths": ["최강 스플릿 푸셔", "탱커 킬러", "급소 고정 피해"],
+        "weaknesses": ["팀파이트 약세", "CC에 취약", "초중반 약세"],
+        "powerSpikes": ["레벨 6", "몰락한 왕의 검", "레벨 16"],
+        "counters": ["Malphite", "Kennen", "Quinn"],
+        "goodAgainst": ["Aatrox", "Jax", "Garen"]
+    },
+    "Fizz": {
+        "id": "Fizz",
+        "name": "피즈",
+        "role": "미드",
+        "type": "암살자",
+        "damageType": "AP",
+        "rangeType": "근접",
+        "stats": {
+            "early": 4, "mid": 8, "late": 7,
+            "sustain": 3, "burst": 9, "dps": 5,
+            "cc": 5, "mobility": 8, "tankiness": 3, "utility": 2
+        },
+        "strengths": ["극강의 폭딜", "회피기(E)", "원콤 포텐셜"],
+        "weaknesses": ["초반 라인전 약세", "원거리 견제에 취약", "미니언 정리 느림"],
+        "powerSpikes": ["레벨 3", "레벨 6", "마법공학 로켓벨트"],
+        "counters": ["Lissandra", "Galio", "Syndra"],
+        "goodAgainst": ["Lux", "Ahri", "Viktor"]
+    },
+    "Garen": {
+        "id": "Garen",
+        "name": "가렌",
+        "role": "탑",
+        "type": "탱커",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 6, "mid": 7, "late": 6,
+            "sustain": 8, "burst": 6, "dps": 5,
+            "cc": 3, "mobility": 5, "tankiness": 9, "utility": 3
+        },
+        "strengths": ["높은 체력 재생", "침묵기", "단순하고 강력한 딜"],
+        "weaknesses": ["카이팅에 취약", "CC 부족", "원거리에 불리"],
+        "powerSpikes": ["레벨 6", "몰락한 왕의 검", "레벨 11"],
+        "counters": ["Darius", "Teemo", "Vayne"],
+        "goodAgainst": ["Nasus", "Malphite", "Ornn"]
+    },
+    "Gwen": {
+        "id": "Gwen",
+        "name": "그웬",
+        "role": "탑",
+        "type": "전사",
+        "damageType": "AP",
+        "rangeType": "근접",
+        "stats": {
+            "early": 4, "mid": 7, "late": 9,
+            "sustain": 7, "burst": 6, "dps": 8,
+            "cc": 3, "mobility": 6, "tankiness": 5, "utility": 3
+        },
+        "strengths": ["탱커 킬러", "안개로 원거리 면역", "후반 스케일링"],
+        "weaknesses": ["초반 매우 약함", "갱킹에 취약", "CC 부족"],
+        "powerSpikes": ["레벨 6", "내셔의 이빨", "레벨 16"],
+        "counters": ["Irelia", "Riven", "Renekton"],
+        "goodAgainst": ["Malphite", "Ornn", "Mordekaiser"]
+    },
+    "Irelia": {
+        "id": "Irelia",
+        "name": "이렐리아",
+        "role": "탑",
+        "type": "전사",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 7, "mid": 8, "late": 6,
+            "sustain": 7, "burst": 6, "dps": 8,
+            "cc": 5, "mobility": 9, "tankiness": 5, "utility": 3
+        },
+        "strengths": ["극강의 기동력", "미니언 활용 진입", "스택 쌓으면 강력"],
+        "weaknesses": ["CC에 취약", "스택 없으면 약함", "후반 하락"],
+        "powerSpikes": ["레벨 4 (스택 풀)", "레벨 6", "몰락한 왕의 검"],
+        "counters": ["Sett", "Renekton", "Garen"],
+        "goodAgainst": ["Aatrox", "Fiora", "Gwen"]
+    },
+    "Jax": {
+        "id": "Jax",
+        "name": "잭스",
+        "role": "탑",
+        "type": "브루저",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 5, "mid": 7, "late": 9,
+            "sustain": 4, "burst": 6, "dps": 8,
+            "cc": 5, "mobility": 6, "tankiness": 7, "utility": 3
+        },
+        "strengths": ["최강 후반 1대1", "기본공격 회피(E)", "타워 철거"],
+        "weaknesses": ["초반 라인전 약세", "원거리에 불리", "CC에 취약"],
+        "powerSpikes": ["레벨 6", "삼위일체", "레벨 16"],
+        "counters": ["Malphite", "Teemo", "Kennen"],
+        "goodAgainst": ["Camille", "Garen", "Nasus"]
+    },
+    "Kassadin": {
+        "id": "Kassadin",
+        "name": "카사딘",
+        "role": "미드",
+        "type": "암살자",
+        "damageType": "AP",
+        "rangeType": "근접",
+        "stats": {
+            "early": 2, "mid": 6, "late": 10,
+            "sustain": 3, "burst": 8, "dps": 7,
+            "cc": 3, "mobility": 9, "tankiness": 4, "utility": 2
+        },
+        "strengths": ["최강 후반 캐리력", "짧은 쿨 점멸", "AP 상대 강함"],
+        "weaknesses": ["초반 극약세", "AD 상대 불리", "레벨 16 전 약함"],
+        "powerSpikes": ["레벨 6", "레벨 11", "레벨 16"],
+        "counters": ["Zed", "Talon", "Lucian"],
+        "goodAgainst": ["Ahri", "Katarina", "Vex"]
+    },
+    "Katarina": {
+        "id": "Katarina",
+        "name": "카타리나",
+        "role": "미드",
+        "type": "암살자",
+        "damageType": "AP",
+        "rangeType": "근접",
+        "stats": {
+            "early": 4, "mid": 8, "late": 8,
+            "sustain": 3, "burst": 9, "dps": 7,
+            "cc": 2, "mobility": 9, "tankiness": 2, "utility": 2
+        },
+        "strengths": ["리셋 전투", "강력한 로밍", "멀티킬 포텐셜"],
+        "weaknesses": ["CC에 극도로 취약", "라인전 약세", "하드CC로 궁 끊김"],
+        "powerSpikes": ["레벨 3", "레벨 6", "마법공학 로켓벨트"],
+        "counters": ["Kassadin", "Galio", "Syndra"],
+        "goodAgainst": ["Lux", "Vex", "Viktor"]
+    },
+    "LeBlanc": {
+        "id": "Leblanc",
+        "name": "르블랑",
+        "role": "미드",
+        "type": "암살자",
+        "damageType": "AP",
+        "rangeType": "원거리",
+        "stats": {
+            "early": 7, "mid": 8, "late": 5,
+            "sustain": 2, "burst": 9, "dps": 4,
+            "cc": 6, "mobility": 9, "tankiness": 2, "utility": 3
+        },
+        "strengths": ["초반 킬 압박", "높은 폭딜", "안전한 진입/이탈"],
+        "weaknesses": ["후반 약세", "웨이브클리어 부족", "미니언 정리 느림"],
+        "powerSpikes": ["레벨 2", "레벨 6", "루덴의 폭풍"],
+        "counters": ["Kassadin", "Galio", "Fizz"],
+        "goodAgainst": ["Zed", "Yasuo", "Syndra"]
+    },
+    "Lux": {
+        "id": "Lux",
+        "name": "럭스",
+        "role": "미드",
+        "type": "메이지",
+        "damageType": "AP",
+        "rangeType": "원거리",
+        "stats": {
+            "early": 5, "mid": 7, "late": 7,
+            "sustain": 3, "burst": 8, "dps": 5,
+            "cc": 7, "mobility": 3, "tankiness": 2, "utility": 7
+        },
+        "strengths": ["긴 사거리", "강력한 CC", "원콤 포텐셜"],
+        "weaknesses": ["기동력 부족", "스킬샷 의존", "암살자에 취약"],
+        "powerSpikes": ["레벨 6", "루덴의 폭풍", "레벨 11"],
+        "counters": ["Fizz", "Zed", "Katarina"],
+        "goodAgainst": ["Vex", "Orianna", "Syndra"]
+    },
+    "Malphite": {
+        "id": "Malphite",
+        "name": "말파이트",
+        "role": "탑",
+        "type": "탱커",
+        "damageType": "AP",
+        "rangeType": "근접",
+        "stats": {
+            "early": 4, "mid": 6, "late": 8,
+            "sustain": 5, "burst": 6, "dps": 3,
+            "cc": 9, "mobility": 4, "tankiness": 9, "utility": 7
+        },
+        "strengths": ["최강 궁극기 이니시", "AD 상대 강함", "팀파이트 지배"],
+        "weaknesses": ["초반 라인전 약세", "AP 상대 불리", "마나 부족"],
+        "powerSpikes": ["레벨 6", "태양불꽃 방패", "레벨 11"],
+        "counters": ["Gwen", "Mordekaiser", "Nasus"],
+        "goodAgainst": ["Fiora", "Jax", "Irelia"]
+    },
+    "Mordekaiser": {
+        "id": "Mordekaiser",
+        "name": "모데카이저",
+        "role": "탑",
+        "type": "브루저",
+        "damageType": "AP",
+        "rangeType": "근접",
+        "stats": {
+            "early": 6, "mid": 8, "late": 6,
+            "sustain": 7, "burst": 6, "dps": 7,
+            "cc": 5, "mobility": 3, "tankiness": 8, "utility": 3
+        },
+        "strengths": ["1대1 강제(궁)", "높은 체력회복", "탱킹 능력"],
+        "weaknesses": ["기동력 부족", "카이팅에 취약", "은갈퀴 필수"],
+        "powerSpikes": ["레벨 6", "리안드리의 고뇌", "레벨 11"],
+        "counters": ["Fiora", "Gwen", "Vayne"],
+        "goodAgainst": ["Garen", "Malphite", "Ornn"]
+    },
+    "Nasus": {
+        "id": "Nasus",
+        "name": "나서스",
+        "role": "탑",
+        "type": "브루저",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 2, "mid": 6, "late": 9,
+            "sustain": 7, "burst": 6, "dps": 7,
+            "cc": 6, "mobility": 3, "tankiness": 8, "utility": 4
+        },
+        "strengths": ["무한 스케일링(Q)", "강력한 슬로우", "타워 철거"],
+        "weaknesses": ["초반 극약세", "카이팅에 취약", "기동력 부족"],
+        "powerSpikes": ["Q 스택 200+", "레벨 6", "삼위일체"],
+        "counters": ["Darius", "Renekton", "Teemo"],
+        "goodAgainst": ["Malphite", "Ornn", "Garen"]
+    },
+    "Orianna": {
+        "id": "Orianna",
+        "name": "오리아나",
+        "role": "미드",
+        "type": "메이지",
+        "damageType": "AP",
+        "rangeType": "원거리",
+        "stats": {
+            "early": 5, "mid": 7, "late": 8,
+            "sustain": 3, "burst": 7, "dps": 6,
+            "cc": 7, "mobility": 4, "tankiness": 3, "utility": 8
+        },
+        "strengths": ["팀파이트 궁극기", "안정적인 딜링", "보호막 유틸"],
+        "weaknesses": ["기동력 부족", "암살자에 취약", "공 위치 관리"],
+        "powerSpikes": ["레벨 6", "루덴의 폭풍", "레벨 11"],
+        "counters": ["Fizz", "Zed", "Akali"],
+        "goodAgainst": ["Lux", "Syndra", "Vex"]
+    },
+    "Renekton": {
+        "id": "Renekton",
+        "name": "레넥톤",
+        "role": "탑",
+        "type": "브루저",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 9, "mid": 7, "late": 3,
+            "sustain": 6, "burst": 7, "dps": 6,
+            "cc": 6, "mobility": 6, "tankiness": 6, "utility": 3
+        },
+        "strengths": ["최강 초반 라인전", "스턴 보유", "다이브 능력"],
+        "weaknesses": ["후반 극약세", "분노 관리 필요", "스케일링 없음"],
+        "powerSpikes": ["레벨 3", "레벨 6", "선혈포식자"],
+        "counters": ["Fiora", "Camille", "Jax"],
+        "goodAgainst": ["Nasus", "Gwen", "Irelia"]
+    },
+    "Riven": {
+        "id": "Riven",
+        "name": "리븐",
+        "role": "탑",
+        "type": "전사",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 7, "mid": 8, "late": 7,
+            "sustain": 3, "burst": 8, "dps": 7,
+            "cc": 5, "mobility": 9, "tankiness": 4, "utility": 2
+        },
+        "strengths": ["높은 기동력", "강력한 콤보", "쿨감 스케일링"],
+        "weaknesses": ["고난이도", "CC에 취약", "체력회복 없음"],
+        "powerSpikes": ["레벨 3", "레벨 6", "이클립스"],
+        "counters": ["Renekton", "Sett", "Malphite"],
+        "goodAgainst": ["Aatrox", "Gwen", "Camille"]
+    },
+    "Sett": {
+        "id": "Sett",
+        "name": "세트",
+        "role": "탑",
+        "type": "브루저",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 8, "mid": 7, "late": 5,
+            "sustain": 7, "burst": 7, "dps": 6,
+            "cc": 7, "mobility": 4, "tankiness": 7, "utility": 5
+        },
+        "strengths": ["강력한 1대1", "W 고정 피해", "궁 이니시"],
+        "weaknesses": ["카이팅에 취약", "기동력 부족", "W 빗나가면 취약"],
+        "powerSpikes": ["레벨 1", "레벨 6", "선혈포식자"],
+        "counters": ["Fiora", "Gwen", "Camille"],
+        "goodAgainst": ["Irelia", "Riven", "Aatrox"]
+    },
+    "Sylas": {
+        "id": "Sylas",
+        "name": "사일러스",
+        "role": "미드",
+        "type": "브루저",
+        "damageType": "AP",
+        "rangeType": "근접",
+        "stats": {
+            "early": 5, "mid": 8, "late": 7,
+            "sustain": 7, "burst": 7, "dps": 6,
+            "cc": 5, "mobility": 7, "tankiness": 5, "utility": 6
+        },
+        "strengths": ["궁극기 탈취", "높은 체력회복", "유연한 빌드"],
+        "weaknesses": ["마나 소모 큼", "좋은 궁이 없으면 약함", "웨이브클리어 보통"],
+        "powerSpikes": ["레벨 3", "레벨 6", "이클립스"],
+        "counters": ["Cassiopeia", "Syndra", "Orianna"],
+        "goodAgainst": ["Yasuo", "Yone", "Katarina"]
+    },
+    "Syndra": {
+        "id": "Syndra",
+        "name": "신드라",
+        "role": "미드",
+        "type": "메이지",
+        "damageType": "AP",
+        "rangeType": "원거리",
+        "stats": {
+            "early": 6, "mid": 8, "late": 7,
+            "sustain": 2, "burst": 9, "dps": 6,
+            "cc": 7, "mobility": 3, "tankiness": 2, "utility": 5
+        },
+        "strengths": ["극강의 폭딜", "강력한 CC(E)", "라인전 압박"],
+        "weaknesses": ["기동력 부족", "암살자에 취약", "스킬샷 의존"],
+        "powerSpikes": ["레벨 6", "루덴의 폭풍", "레벨 11"],
+        "counters": ["Fizz", "Zed", "Yasuo"],
+        "goodAgainst": ["Lux", "Orianna", "Viktor"]
+    },
+    "Teemo": {
+        "id": "Teemo",
+        "name": "티모",
+        "role": "탑",
+        "type": "메이지",
+        "damageType": "AP",
+        "rangeType": "원거리",
+        "stats": {
+            "early": 7, "mid": 6, "late": 5,
+            "sustain": 3, "burst": 5, "dps": 7,
+            "cc": 4, "mobility": 5, "tankiness": 2, "utility": 5
+        },
+        "strengths": ["원거리 견제", "실명(Q)", "버섯 시야 장악"],
+        "weaknesses": ["탱킹 불가", "갱킹에 취약", "팀파이트 약세"],
+        "powerSpikes": ["레벨 1", "레벨 6", "내셔의 이빨"],
+        "counters": ["Irelia", "Camille", "Riven"],
+        "goodAgainst": ["Garen", "Nasus", "Darius"]
+    },
+    "Vex": {
+        "id": "Vex",
+        "name": "벡스",
+        "role": "미드",
+        "type": "메이지",
+        "damageType": "AP",
+        "rangeType": "원거리",
+        "stats": {
+            "early": 5, "mid": 8, "late": 6,
+            "sustain": 3, "burst": 8, "dps": 5,
+            "cc": 7, "mobility": 5, "tankiness": 3, "utility": 5
+        },
+        "strengths": ["대시 방지(패시브)", "강력한 궁 진입", "안티 기동성"],
+        "weaknesses": ["기동력 보통", "궁 빗나가면 취약", "초반 약세"],
+        "powerSpikes": ["레벨 6", "루덴의 폭풍", "레벨 11"],
+        "counters": ["Kassadin", "Syndra", "Orianna"],
+        "goodAgainst": ["Yasuo", "Yone", "Katarina"]
+    },
+    "Viktor": {
+        "id": "Viktor",
+        "name": "빅토르",
+        "role": "미드",
+        "type": "메이지",
+        "damageType": "AP",
+        "rangeType": "원거리",
+        "stats": {
+            "early": 4, "mid": 7, "late": 9,
+            "sustain": 3, "burst": 7, "dps": 8,
+            "cc": 5, "mobility": 3, "tankiness": 3, "utility": 5
+        },
+        "strengths": ["최강 후반 딜링", "웨이브클리어", "존 컨트롤"],
+        "weaknesses": ["초반 약세", "기동력 부족", "업그레이드 전 약함"],
+        "powerSpikes": ["E 업그레이드", "레벨 11", "아이템 3코어"],
+        "counters": ["Fizz", "Zed", "Akali"],
+        "goodAgainst": ["Lux", "Orianna", "Syndra"]
+    },
+    "Yasuo": {
+        "id": "Yasuo",
+        "name": "야스오",
+        "role": "미드",
+        "type": "전사",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 5, "mid": 7, "late": 9,
+            "sustain": 4, "burst": 7, "dps": 9,
+            "cc": 5, "mobility": 8, "tankiness": 3, "utility": 3
+        },
+        "strengths": ["방벽으로 투사체 차단", "높은 DPS", "치명타 스케일링"],
+        "weaknesses": ["CC에 취약", "초반 약세", "난이도 높음"],
+        "powerSpikes": ["레벨 6", "크라켄 학살자", "100% 치명타"],
+        "counters": ["Renekton", "Pantheon", "Vex"],
+        "goodAgainst": ["Lux", "Syndra", "Orianna"]
+    },
+    "Yone": {
+        "id": "Yone",
+        "name": "요네",
+        "role": "미드",
+        "type": "전사",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 4, "mid": 7, "late": 9,
+            "sustain": 5, "burst": 7, "dps": 9,
+            "cc": 6, "mobility": 7, "tankiness": 3, "utility": 3
+        },
+        "strengths": ["강력한 후반", "혼합 피해", "광역 궁극기"],
+        "weaknesses": ["초반 약세", "CC에 취약", "E 복귀 예측 가능"],
+        "powerSpikes": ["레벨 6", "크라켄 학살자", "100% 치명타"],
+        "counters": ["Renekton", "Pantheon", "Sett"],
+        "goodAgainst": ["Lux", "Viktor", "Orianna"]
+    },
+    "Zed": {
+        "id": "Zed",
+        "name": "제드",
+        "role": "미드",
+        "type": "암살자",
+        "damageType": "AD",
+        "rangeType": "근접",
+        "stats": {
+            "early": 6, "mid": 9, "late": 6,
+            "sustain": 3, "burst": 10, "dps": 5,
+            "cc": 2, "mobility": 8, "tankiness": 3, "utility": 2
+        },
+        "strengths": ["최강 단일 폭딜", "에너지 기반(마나 없음)", "스플릿 푸시"],
+        "weaknesses": ["중갑에 불리", "CC에 취약", "팀파이트 어려움"],
+        "powerSpikes": ["레벨 3", "레벨 6", "칠흑의 양날 도끼"],
+        "counters": ["Malphite", "Galio", "Lissandra"],
+        "goodAgainst": ["Lux", "Ahri", "Viktor"]
+    }
+}

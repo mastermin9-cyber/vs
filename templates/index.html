@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VS.LOL - 챔피언 상성 분석</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>VS<span class="accent">.</span>LOL</h1>
+            <p class="subtitle">챔피언 상성 분석기</p>
+        </header>
+
+        <section class="champion-select">
+            <div class="champion-panel my-panel">
+                <h2>내 챔피언</h2>
+                <div class="search-wrapper">
+                    <input type="text" id="myChampSearch" placeholder="챔피언 검색..." autocomplete="off">
+                    <div class="dropdown" id="myChampDropdown"></div>
+                </div>
+                <div class="champion-display" id="myChampDisplay">
+                    <div class="champion-placeholder">챔피언을 선택하세요</div>
+                </div>
+            </div>
+
+            <div class="vs-badge">
+                <span>VS</span>
+            </div>
+
+            <div class="champion-panel enemy-panel">
+                <h2>상대 챔피언</h2>
+                <div class="search-wrapper">
+                    <input type="text" id="enemyChampSearch" placeholder="챔피언 검색..." autocomplete="off">
+                    <div class="dropdown" id="enemyChampDropdown"></div>
+                </div>
+                <div class="champion-display" id="enemyChampDisplay">
+                    <div class="champion-placeholder">챔피언을 선택하세요</div>
+                </div>
+            </div>
+        </section>
+
+        <button class="analyze-btn" id="analyzeBtn" disabled>상성 분석하기</button>
+
+        <section class="results" id="results" style="display:none;">
+            <div class="result-header">
+                <div class="matchup-champs">
+                    <span id="resultMyChamp"></span>
+                    <span class="result-vs">VS</span>
+                    <span id="resultEnemyChamp"></span>
+                </div>
+                <div class="rating-display" id="ratingDisplay">
+                    <div class="rating-bar">
+                        <div class="rating-fill" id="ratingFill"></div>
+                    </div>
+                    <div class="rating-text" id="ratingText"></div>
+                </div>
+                <p class="summary" id="matchupSummary"></p>
+            </div>
+
+            <div class="phases">
+                <div class="phase-card" id="earlyPhase">
+                    <h3>초반 (1~8레벨)</h3>
+                    <div class="phase-rating"></div>
+                    <p class="phase-desc"></p>
+                </div>
+                <div class="phase-card" id="midPhase">
+                    <h3>중반 (9~13레벨)</h3>
+                    <div class="phase-rating"></div>
+                    <p class="phase-desc"></p>
+                </div>
+                <div class="phase-card" id="latePhase">
+                    <h3>후반 (14레벨~)</h3>
+                    <div class="phase-rating"></div>
+                    <p class="phase-desc"></p>
+                </div>
+            </div>
+
+            <div class="tips-section">
+                <div class="tips-card">
+                    <h3>공략 팁</h3>
+                    <ul id="tipsList"></ul>
+                </div>
+                <div class="warnings-card">
+                    <h3>주의사항</h3>
+                    <ul id="warningsList"></ul>
+                </div>
+            </div>
+
+            <div class="counters-section" id="countersSection">
+                <h3>상대에게 강한 챔피언 추천</h3>
+                <div class="counters-grid" id="countersGrid"></div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
