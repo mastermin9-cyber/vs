@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoL 챔피언 상성 체크</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0e14;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            padding: 30px 20px 10px;
+        }
+        .header h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #c89b3c, #f0e6d2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+        .header p { color: #5a6a7a; margin-top: 6px; font-size: 14px; }
+
+        .matchup-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            padding: 30px 20px;
+            flex-wrap: wrap;
+        }
+        .champ-box {
+            width: 260px;
+            background: #151b23;
+            border: 1px solid #2a3040;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        .champ-box.my-champ { border-color: #1a6dd4; }
+        .champ-box.enemy-champ { border-color: #d42a2a; }
+        .champ-box label {
+            display: block;
+            font-size: 13px;
+            color: #8b949e;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .champ-box.my-champ label { color: #4a9eff; }
+        .champ-box.enemy-champ label { color: #ff4a4a; }
+
+        .champ-input-wrap {
+            position: relative;
+        }
+        .champ-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0d1117;
+            border: 1px solid #2a3040;
+            border-radius: 8px;
+            color: #f0e6d2;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .champ-input:focus { border-color: #c89b3c; }
+        .champ-input::placeholder { color: #3a4450; }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #151b23;
+            border: 1px solid #2a3040;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        .dropdown.show { display: block; }
+        .dropdown-item {
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+        .dropdown-item:hover { background: #1c2533; color: #c89b3c; }
+
+        .champ-portrait {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #0d1117;
+            margin: 14px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 2px solid #2a3040;
+        }
+
+        .vs-icon {
+            font-size: 36px;
+            font-weight: 900;
+            color: #c89b3c;
+            text-shadow: 0 0 20px rgba(200,155,60,0.3);
+            align-self: center;
+        }
+
+        .analyze-btn {
+            display: block;
+            margin: 0 auto 30px;
+            padding: 12px 50px;
+            background: linear-gradient(135deg, #c89b3c, #a67c2e);
+            color: #0a0e14;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200,155,60,0.3);
+        }
+        .analyze-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-area {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            display: none;
+        }
+        .result-area.show { display: block; }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .result-header h2 {
+            font-size: 22px;
+            color: #f0e6d2;
+        }
+
+        .winrate-bar-wrap {
+            background: #151b23;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #2a3040;
+        }
+        .winrate-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .winrate-bar {
+            height: 28px;
+            background: #d42a2a;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        .winrate-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1a6dd4, #4a9eff);
+            border-radius: 6px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            min-width: 40px;
+        }
+        .matchup-grade {
+            text-align: center;
+            font-size: 16px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .section-card {
+            background: #151b23;
+            border: 1px solid #2a3040;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .section-card h3 {
+            font-size: 16px;
+            color: #c89b3c;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a3040;
+        }
+
+        .timeline {
+            display: flex;
+            gap: 0;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .timeline-phase {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .timeline-phase .phase-name { font-size: 11px; opacity: 0.8; margin-bottom: 4px; }
+        .timeline-phase .phase-result { font-size: 14px; }
+        .phase-win { background: #132d1a; color: #4ade80; }
+        .phase-lose { background: #2d1313; color: #f87171; }
+        .phase-even { background: #2d2713; color: #fbbf24; }
+
+        .tips-list { list-style: none; }
+        .tips-list li {
+            padding: 8px 0 8px 24px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.6;
+            border-bottom: 1px solid #1a2030;
+        }
+        .tips-list li:last-child { border-bottom: none; }
+        .tips-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 6px;
+            color: #c89b3c;
+        }
+
+        .key-times {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .key-time-card {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+        .key-time-card .time { color: #c89b3c; font-size: 20px; font-weight: 700; }
+        .key-time-card .desc { font-size: 13px; color: #8b949e; margin-top: 4px; }
+
+        .danger-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+        .tag-danger { background: #3d1313; color: #f87171; }
+        .tag-caution { background: #3d3113; color: #fbbf24; }
+        .tag-safe { background: #133d1a; color: #4ade80; }
+
+        .recommend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .recommend-card {
+            background: #0d1117;
+            border: 1px solid #2a3040;
+            border-radius: 10px;
+            padding: 16px;
+            transition: border-color 0.2s, transform 0.2s;
+            cursor: default;
+        }
+        .recommend-card:hover {
+            border-color: #c89b3c;
+            transform: translateY(-3px);
+        }
+        .recommend-card .rc-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .recommend-card .rc-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #151b23;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid #2a3040;
+            flex-shrink: 0;
+        }
+        .recommend-card .rc-info { flex: 1; }
+        .recommend-card .rc-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f0e6d2;
+        }
+        .recommend-card .rc-role {
+            font-size: 11px;
+            color: #5a6a7a;
+        }
+        .recommend-card .rc-wr {
+            font-size: 13px;
+            font-weight: 700;
+            text-align: right;
+        }
+        .rc-wr.high { color: #4ade80; }
+        .rc-wr.mid { color: #fbbf24; }
+        .recommend-card .rc-reason {
+            font-size: 12px;
+            color: #8b949e;
+            line-height: 1.5;
+            border-top: 1px solid #1a2030;
+            padding-top: 8px;
+        }
+        .recommend-card .rc-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .rc-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #132d1a;
+            color: #4ade80;
+        }
+        .recommend-section-sub {
+            font-size: 13px;
+            color: #5a6a7a;
+            margin-bottom: 14px;
+        }
+        .recommend-role-filter {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .role-btn {
+            padding: 6px 16px;
+            border: 1px solid #2a3040;
+            background: #0d1117;
+            color: #8b949e;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .role-btn:hover { border-color: #c89b3c; color: #c89b3c; }
+        .role-btn.active { background: #c89b3c; color: #0a0e14; border-color: #c89b3c; font-weight: 700; }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: #c89b3c;
+            color: #0a0e14;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0e14; }
+        ::-webkit-scrollbar-thumb { background: #2a3040; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>LoL 챔피언 상성 체크</h1>
+    <p>두 챔피언의 상성, 파워 스파이크, 주의사항을 확인하세요</p>
+</div>
+
+<div class="matchup-container">
+    <div class="champ-box my-champ">
+        <label>내 챔피언</label>
+        <div class="champ-input-wrap">
+            <input type="text" class="champ-input" id="myChamp" placeholder="챔피언 이름..." autocomplete="off">
+            <div class="dropdown" id="myDropdown"></div>
+        </div>
+        <div class="champ-portrait" id="myPortrait">?</div>
+    </div>
+
+    <div class="vs-icon">VS</div>
+
+    <div class="champ-box enemy-champ">
+        <label>상대 챔피언</label>
+        <div class="champ-input-wrap">
+            <input type="text" class="champ-input" id="enemyChamp" placeholder="챔피언 이름..." autocomplete="off">
+            <div class="dropdown" id="enemyDropdown"></div>
+        </div>
+        <div class="champ-portrait" id="enemyPortrait">?</div>
+    </div>
+</div>
+
+<button class="analyze-btn" id="analyzeBtn" disabled>상성 분석</button>
+
+<div class="result-area" id="resultArea">
+    <div class="result-header">
+        <h2 id="resultTitle"></h2>
+    </div>
+
+    <div class="winrate-bar-wrap">
+        <div class="winrate-label">
+            <span id="wrMyName" style="color:#4a9eff"></span>
+            <span id="wrEnemyName" style="color:#ff4a4a"></span>
+        </div>
+        <div class="winrate-bar">
+            <div class="winrate-fill" id="wrFill"></div>
+        </div>
+        <div class="matchup-grade" id="matchupGrade"></div>
+    </div>
+
+    <div class="section-card">
+        <h3>시간대별 파워 밸런스</h3>
+        <div class="timeline" id="timeline"></div>
+        <div class="key-times" id="keyTimes"></div>
+    </div>
+
+    <div class="section-card">
+        <h3>상성 분석</h3>
+        <p id="matchupSummary" style="font-size:14px;line-height:1.7;margin-bottom:12px;"></p>
+        <div id="matchupTags"></div>
+    </div>
+
+    <div class="section-card">
+        <h3>라인전 공략 & 주의사항</h3>
+        <ul class="tips-list" id="tipsList"></ul>
+    </div>
+
+    <div class="section-card">
+        <h3>핵심 타이밍 & 전략</h3>
+        <ul class="tips-list" id="strategyList"></ul>
+    </div>
+
+    <div class="section-card" id="recommendSection" style="display:none;">
+        <h3 id="recommendTitle">상대에게 유리한 챔피언 추천</h3>
+        <p class="recommend-section-sub" id="recommendSub"></p>
+        <div class="recommend-role-filter" id="roleFilter"></div>
+        <div class="recommend-grid" id="recommendGrid"></div>
+    </div>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+const CHAMPIONS = {
+    // ===== 탑 =====
+    "가렌": { role: "탑", type: "탱커/전사", icon: "🛡️",
+        power: { early: 6, mid: 7, late: 6 },
+        spikes: ["레벨 6 (궁극기 처형)", "스트라이드브레이커 완성", "레벨 11 궁 강화"],
+        strengths: ["지속 전투력", "체력 재생 패시브", "사일런스+처형 궁"],
+        weaknesses: ["카이팅에 약함", "CC 부족", "원거리 견제에 취약"]
+    },
+    "다리우스": { role: "탑", type: "전사", icon: "🪓",
+        power: { early: 8, mid: 7, late: 5 },
+        spikes: ["레벨 1-3 (올인 강력)", "트라이포스 완성", "레벨 6 궁극기"],
+        strengths: ["초반 올인 최강", "출혈 5중첩 폭발력", "궁 리셋"],
+        weaknesses: ["카이팅에 매우 약함", "후반 약세", "기동력 부족"]
+    },
+    "피오라": { role: "탑", type: "전사", icon: "⚔️",
+        power: { early: 5, mid: 7, late: 9 },
+        spikes: ["레벨 1 (급소 찌르기)", "신성한 파괴자 완성", "레벨 6 궁극기"],
+        strengths: ["1대1 최강급", "급소 찌르기 지속딜", "CC 무효화(W)"],
+        weaknesses: ["팀파이트 약함", "CC에 취약", "갱킹에 약함"]
+    },
+    "말파이트": { role: "탑", type: "탱커", icon: "🪨",
+        power: { early: 3, mid: 5, late: 8 },
+        spikes: ["레벨 6 (궁극기 이니시)", "얼어붙은 심장 완성", "40% 쿨감"],
+        strengths: ["궁 이니시 최강", "AD 상대 탱킹", "팀파이트 캐리"],
+        weaknesses: ["초반 약함", "AP 상대에 취약", "마나 부족"]
+    },
+    "나서스": { role: "탑", type: "전사/탱커", icon: "🐕",
+        power: { early: 2, mid: 5, late: 10 },
+        spikes: ["Q 스택 200 (약 15분)", "삼위일체 완성", "레벨 6+스택 충분시"],
+        strengths: ["무한 스케일링", "후반 1대1 최강", "궁극기 탱킹+딜"],
+        weaknesses: ["초반 극약", "카이팅에 약함", "CC에 취약"]
+    },
+    "리븐": { role: "탑", type: "전사", icon: "💨",
+        power: { early: 7, mid: 8, late: 7 },
+        spikes: ["레벨 1-3 (콤보 데미지)", "이클립스 완성", "레벨 6 궁극기"],
+        strengths: ["높은 기동성", "강력한 콤보 데미지", "쿨감시 무한 싸움"],
+        weaknesses: ["CC에 취약", "숙련도 요구 높음", "탱커 상대 어려움"]
+    },
+    "세트": { role: "탑", type: "전사", icon: "👊",
+        power: { early: 8, mid: 7, late: 5 },
+        spikes: ["레벨 1-3 (W 폭발딜)", "스트라이드브레이커 완성", "레벨 6 궁극기"],
+        strengths: ["초반 교전 강력", "W 방어막+딜", "궁 이니시"],
+        weaknesses: ["카이팅에 약함", "후반 약세", "기동력 부족"]
+    },
+    "요네": { role: "탑/미드", type: "전사", icon: "🌀",
+        power: { early: 3, mid: 7, late: 9 },
+        spikes: ["레벨 3 (Q3+E 콤보)", "불멸의 칼날 완성", "2코어 완성"],
+        strengths: ["후반 캐리력", "혼합 데미지", "궁 이니시"],
+        weaknesses: ["초반 약함", "CC에 취약", "딜교 타이밍 중요"]
+    },
+    "모데카이저": { role: "탑", type: "전사/마법사", icon: "☠️",
+        power: { early: 5, mid: 8, late: 6 },
+        spikes: ["레벨 6 (죽음의 영역)", "리안드리의 고통 완성", "레벨 9 Q맥스"],
+        strengths: ["궁으로 1대1 강제", "AP 탱커", "패시브 지속딜"],
+        weaknesses: ["카이팅에 약함", "궁 QSS로 무력화", "기동력 부족"]
+    },
+    "잭스": { role: "탑", type: "전사", icon: "🏮",
+        power: { early: 4, mid: 7, late: 9 },
+        spikes: ["레벨 6 (궁 방어력)", "삼위일체 완성", "2코어 이후"],
+        strengths: ["후반 1대1 강력", "E 회피 스킬", "혼합 데미지"],
+        weaknesses: ["초반 약함", "원거리에 취약", "궁 쿨타임 의존"]
+    },
+    "오른": { role: "탑", type: "탱커", icon: "🔨",
+        power: { early: 5, mid: 7, late: 9 },
+        spikes: ["레벨 3 (풀콤보)", "아이템 업그레이드 시작", "레벨 13+"],
+        strengths: ["아군 아이템 강화", "CC 다량", "후반 탱킹+이니시"],
+        weaknesses: ["킬 압박 부족", "1대1 약함", "원거리에 취약"]
+    },
+    "케넨": { role: "탑", type: "마법사", icon: "⚡",
+        power: { early: 6, mid: 8, late: 7 },
+        spikes: ["레벨 6 (궁극기)", "존야 완성", "로켓벨트+존야"],
+        strengths: ["원거리 탑 견제", "궁 팀파이트", "기동성 좋음"],
+        weaknesses: ["올인에 약함", "궁 쿨 의존", "후반 딜 부족"]
+    },
+    // ===== 미드 =====
+    "아리": { role: "미드", type: "마법사/암살자", icon: "🦊",
+        power: { early: 4, mid: 7, late: 7 },
+        spikes: ["레벨 6 (궁 기동성)", "루덴 완성", "레벨 9 Q맥스"],
+        strengths: ["매혹 CC", "궁 기동성", "안전한 라인전"],
+        weaknesses: ["E 빗나가면 위험", "푸시력 부족 초반", "올인 약함 초반"]
+    },
+    "제드": { role: "미드", type: "암살자", icon: "🥷",
+        power: { early: 5, mid: 9, late: 6 },
+        spikes: ["레벨 3 (WEQ 콤보)", "레벨 6 (올인)", "황혼의 칼날 완성"],
+        strengths: ["레벨 6 올인 최강", "높은 기동성", "AD 암살"],
+        weaknesses: ["CC에 취약", "탱커 상대 어려움", "존야에 무력화"]
+    },
+    "야스오": { role: "미드", type: "전사", icon: "🌪️",
+        power: { early: 3, mid: 7, late: 9 },
+        spikes: ["레벨 2 (EQ콤보)", "불멸의 칼날 완성", "2코어 이후 100%치명타"],
+        strengths: ["바람장막으로 투사체 무효화", "무한 스케일링", "궁으로 팀파이트"],
+        weaknesses: ["초반 약함", "CC에 매우 취약", "미니언 없으면 기동성 감소"]
+    },
+    "르블랑": { role: "미드", type: "암살자", icon: "🎭",
+        power: { early: 6, mid: 9, late: 5 },
+        spikes: ["레벨 2-3 (콤보 딜)", "레벨 6 (콤보 강화)", "루덴 완성"],
+        strengths: ["폭발적 버스트", "높은 기동성", "안전한 귀환(W)"],
+        weaknesses: ["푸시력 부족", "후반 약세", "CC에 취약"]
+    },
+    "빅토르": { role: "미드", type: "마법사", icon: "🔬",
+        power: { early: 4, mid: 7, late: 9 },
+        spikes: ["E 업그레이드 (첫 진화)", "루덴 완성", "3코어 이후"],
+        strengths: ["광역 데미지", "후반 캐리", "존 컨트롤"],
+        weaknesses: ["초반 약함", "기동성 부족", "암살자에 취약"]
+    },
+    "시ンド라": { role: "미드", type: "마법사", icon: "🔮",
+        power: { early: 5, mid: 8, late: 8 },
+        spikes: ["레벨 6 (궁 버스트)", "루덴 완성", "스택 25개 달성"],
+        strengths: ["강력한 버스트", "E 스턴", "궁 단일 타겟 폭발"],
+        weaknesses: ["기동성 부족", "E 빗나가면 취약", "암살자에 약함"]
+    },
+    "카타리나": { role: "미드", type: "암살자", icon: "🗡️",
+        power: { early: 4, mid: 8, late: 8 },
+        spikes: ["레벨 3 (콤보 시작)", "레벨 6 (궁극기)", "나셔의 이빨/로켓벨트 완성"],
+        strengths: ["리셋으로 팀파이트 학살", "높은 기동성", "혼합 데미지"],
+        weaknesses: ["CC에 매우 취약", "라인전 약함", "초반 딜교 약함"]
+    },
+    "럭스": { role: "미드/서포터", type: "마법사", icon: "✨",
+        power: { early: 4, mid: 7, late: 7 },
+        spikes: ["레벨 6 (궁 포킹)", "루덴 완성", "40% 쿨감"],
+        strengths: ["장거리 Q 스턴", "궁 쿨타임 짧음", "실드 서포트"],
+        weaknesses: ["기동성 없음", "Q 빗나가면 취약", "암살자에 약함"]
+    },
+    "아칼리": { role: "미드", type: "암살자", icon: "💀",
+        power: { early: 5, mid: 8, late: 7 },
+        spikes: ["레벨 6 (R1+R2 올인)", "로켓벨트 완성", "레벨 9 Q맥스"],
+        strengths: ["W 은신 강력", "높은 기동성", "타워 다이브 능력"],
+        weaknesses: ["초반 라인전 어려움", "에너지 관리 필요", "CC에 취약"]
+    },
+    "시너지라": { role: "미드", type: "마법사", icon: "🌙" },
+    // ===== 원딜 =====
+    "카이사": { role: "원딜", type: "원거리 딜러", icon: "🦋",
+        power: { early: 4, mid: 7, late: 9 },
+        spikes: ["Q 진화 (긴검 3개)", "레벨 6 (궁 포지셔닝)", "E 진화 (공속 빌드)"],
+        strengths: ["스킬 진화 파워스파이크", "궁으로 포지셔닝", "혼합 데미지"],
+        weaknesses: ["짧은 사거리", "초반 약함", "진화 전 약함"]
+    },
+    "진": { role: "원딜", type: "원거리 딜러", icon: "🎭",
+        power: { early: 6, mid: 7, late: 7 },
+        spikes: ["4번째 총알 (네 번째 사격)", "갈퀴발톱 완성", "레벨 6 (궁 유틸)"],
+        strengths: ["4번째 탄환 폭딜", "W 원거리 CC", "궁 장거리 딜"],
+        weaknesses: ["DPS 제한 (4발)", "기동성 부족", "탱커 상대 어려움"]
+    },
+    "이즈리얼": { role: "원딜", type: "원거리 딜러", icon: "🌟",
+        power: { early: 5, mid: 8, late: 7 },
+        spikes: ["삼위일체 완성", "마나무네 완성", "2코어 파워스파이크"],
+        strengths: ["E로 안전함", "스킬샷 포킹", "안전한 라인전"],
+        weaknesses: ["스킬샷 의존", "크리 빌드 대비 DPS 낮음", "탱커 상대 부족"]
+    },
+    "바루스": { role: "원딜", type: "원거리 딜러", icon: "🏹",
+        power: { early: 5, mid: 8, late: 7 },
+        spikes: ["레벨 6 (궁 이니시)", "치명적인 속도+구인수의 격노검", "나셔의 이빨 완성"],
+        strengths: ["궁 이니시에이팅", "온힛 딜", "장거리 Q 포킹"],
+        weaknesses: ["기동성 없음", "자체 생존기 없음", "갱킹에 취약"]
+    },
+    "케이틀린": { role: "원딜", type: "원거리 딜러", icon: "🔫",
+        power: { early: 7, mid: 5, late: 8 },
+        spikes: ["레벨 1-3 (긴 사거리)", "갈퀴발톱 완성", "3코어 이후"],
+        strengths: ["최장 사거리", "덫으로 존 컨트롤", "초반 라인 주도권"],
+        weaknesses: ["중반 약세", "기동성 부족", "닥돌에 취약"]
+    },
+    "징크스": { role: "원딜", type: "원거리 딜러", icon: "🚀",
+        power: { early: 3, mid: 6, late: 10 },
+        spikes: ["크라켄 학살자 완성", "2코어 이후", "패시브 발동 시"],
+        strengths: ["후반 최강 딜러", "패시브 리셋", "광역 로켓"],
+        weaknesses: ["초반 매우 약함", "자체 이동기 없음", "갱킹에 취약"]
+    },
+    // ===== 정글 =====
+    "리신": { role: "정글", type: "전사", icon: "🥋",
+        power: { early: 8, mid: 7, late: 4 },
+        spikes: ["레벨 3 (갱킹 시작)", "레벨 6 (궁 킥)", "갈퀴발톱 완성"],
+        strengths: ["초반 갱킹 최강", "궁 킥 이니시", "높은 기동성"],
+        weaknesses: ["후반 급격히 약해짐", "스킬 의존도 높음", "팀파이트 어려움"]
+    },
+    "비에고": { role: "정글", type: "전사", icon: "👑",
+        power: { early: 5, mid: 8, late: 8 },
+        spikes: ["레벨 6 (리셋 시작)", "삼위일체 완성", "팀파이트 킬 시 (빙의)"],
+        strengths: ["빙의로 팀파이트 리셋", "지속 전투력", "은신 접근"],
+        weaknesses: ["초반 정글링 느림", "CC에 취약", "빙의 타이밍 중요"]
+    },
+    "카직스": { role: "정글", type: "암살자", icon: "🦗",
+        power: { early: 6, mid: 9, late: 6 },
+        spikes: ["레벨 6 (Q/E 진화)", "황혼의 칼날 완성", "고립된 적 발견 시"],
+        strengths: ["고립된 적 즉사", "진화로 성장", "은신 접근"],
+        weaknesses: ["팀파이트 약함", "몰려있으면 약함", "카운터 정글에 취약"]
+    },
+    "그레이브즈": { role: "정글", type: "원거리 전사", icon: "🔫",
+        power: { early: 7, mid: 8, late: 6 },
+        spikes: ["레벨 3 (빠른 정글링)", "이클립스 완성", "레벨 6 (궁 피니시)"],
+        strengths: ["빠른 정글 클리어", "방어력 패시브", "높은 버스트"],
+        weaknesses: ["CC 부족", "팀파이트 기여도 낮음", "탱커에 약함"]
+    },
+    "렝가": { role: "정글", type: "암살자", icon: "🦁",
+        power: { early: 6, mid: 8, late: 7 },
+        spikes: ["레벨 6 (궁 암살)", "황혼의 칼날 완성", "풀스택 사냥 보상"],
+        strengths: ["궁으로 원딜 암살", "부쉬 전투 강력", "스노우볼 능력"],
+        weaknesses: ["CC에 취약", "뒤처지면 무력", "팀파이트 어려움"]
+    },
+    // ===== 서포터 =====
+    "쓰레쉬": { role: "서포터", type: "탱커", icon: "⛓️",
+        power: { early: 6, mid: 7, late: 7 },
+        spikes: ["레벨 2 (Q+E 콤보)", "레벨 6 (궁 가두기)", "졸라 장비 완성"],
+        strengths: ["Q 훅 캐치", "랜턴 구출", "다양한 CC"],
+        weaknesses: ["Q 빗나가면 약함", "소프트한 편", "원거리 포킹에 취약"]
+    },
+    "노틸러스": { role: "서포터", type: "탱커", icon: "⚓",
+        power: { early: 7, mid: 7, late: 6 },
+        spikes: ["레벨 2 (Q+패시브)", "레벨 6 (궁 점업)", "졸라 장비 완성"],
+        strengths: ["궁 점업 확정CC", "패시브 스네어", "올인 강력"],
+        weaknesses: ["기동성 부족", "포킹에 약함", "뒤처지면 터짐"]
+    },
+    "룰루": { role: "서포터", type: "인챈터", icon: "🧚",
+        power: { early: 5, mid: 7, late: 8 },
+        spikes: ["레벨 2 (W+E 교환)", "레벨 6 (궁 서포트)", "슈렐리아 완성"],
+        strengths: ["궁 체력+넉업", "W 변이", "원딜 보호 최강"],
+        weaknesses: ["올인에 약함", "데미지 부족", "W 쿨타임 중 취약"]
+    },
+    "유미": { role: "서포터", type: "인챈터", icon: "🐱",
+        power: { early: 2, mid: 5, late: 8 },
+        spikes: ["레벨 6 (궁극기)", "문라이즈 완성", "강한 아군에 탑승 시"],
+        strengths: ["탑승으로 안전", "지속 힐", "궁 CC"],
+        weaknesses: ["초반 매우 약함", "아군 의존", "내려오면 극취약"]
+    },
+    "레오나": { role: "서포터", type: "탱커", icon: "☀️",
+        power: { early: 7, mid: 8, late: 6 },
+        spikes: ["레벨 2 (E+Q 올인)", "레벨 6 (궁 이니시)", "졸라 장비 완성"],
+        strengths: ["올인 CC 최강", "궁 장거리 이니시", "탱킹 능력"],
+        weaknesses: ["포킹에 약함", "들어가면 빠질 수 없음", "뒤처지면 무력"]
+    }
+};
+
+// ===== 상성 데이터 (내 챔프 vs 상대 챔프) =====
+const MATCHUPS = {
+    "가렌_다리우스": {
+        winrate: 45,
+        grade: "불리",
+        phases: { early: "lose", mid: "even", late: "win" },
+        summary: "다리우스는 가렌의 대표적인 카운터입니다. 초반 출혈 스택과 긴 사거리의 Q로 가렌을 압도합니다. 하지만 중반 이후 가렌의 아이템이 갖춰지면 대등해질 수 있습니다.",
+        tags: [{ text: "초반 주의", type: "danger" }, { text: "중반 이후 기회", type: "caution" }],
+        tips: [
+            "레벨 1-5까지 절대로 올인하지 마세요. 다리우스의 출혈 5스택은 치명적입니다",
+            "Q 외곽(칼날 부분)에 맞지 않도록 오히려 안쪽으로 붙으세요",
+            "다리우스가 E(끌어당기기)를 쓰면 즉시 Q 사일런스 후 빠지세요",
+            "패시브 체력재생을 활용해 짧은 교환 후 회복하는 패턴이 핵심입니다",
+            "닌자 타비 우선 구매를 고려하세요"
+        ],
+        strategy: [
+            "레벨 6 이후 다리우스 체력이 50% 이하일 때 궁으로 처형 가능합니다",
+            "텔레포트를 활용해 다른 라인에서 이득을 보세요",
+            "정글러 갱킹 시 다리우스의 5중첩을 주의하세요 - 2킬 가능성 있음",
+            "중반 이후 스트라이드브레이커 완성 시 1대1 가능해집니다"
+        ],
+        keyTimings: [
+            { time: "레벨 6", desc: "처형 궁극기로 킬 가능" },
+            { time: "1코어", desc: "전투력 대등해지는 시점" },
+            { time: "20분+", desc: "팀파이트에서 가렌이 유리" }
+        ]
+    },
+    "다리우스_가렌": {
+        winrate: 55,
+        grade: "유리",
+        phases: { early: "win", mid: "even", late: "lose" },
+        summary: "다리우스는 가렌을 상대로 초반부터 강력한 압박이 가능합니다. 출혈 스택을 최대한 활용하고, 초반 주도권을 잡아 스노우볼하세요.",
+        tags: [{ text: "초반 강세", type: "safe" }, { text: "후반 주의", type: "caution" }],
+        tips: [
+            "레벨 1부터 공격적으로 출혈 스택을 쌓으세요",
+            "Q 외곽으로 맞추면 체력 회복+출혈 스택+추가 데미지",
+            "가렌이 Q로 접근 시 E로 끌어당긴 후 W(둔화)로 풀콤보",
+            "가렌 패시브 재생을 허용하지 않도록 지속적으로 교전하세요",
+            "가렌 궁 처형 라인을 주의하고 체력 관리하세요"
+        ],
+        strategy: [
+            "초반 킬을 잡고 아이템 격차를 벌리는 것이 핵심",
+            "중반 이후 가렌이 탱커 아이템을 쌓으면 킬이 어려워집니다",
+            "스노우볼이 안 되면 팀파이트에서 불리하니 빠르게 끝내세요",
+            "가렌 텔포 로밍 시 탑 타워를 빠르게 밀어세요"
+        ],
+        keyTimings: [
+            { time: "레벨 1-3", desc: "가장 유리한 구간" },
+            { time: "레벨 6", desc: "양쪽 모두 처형 궁 주의" },
+            { time: "15분+", desc: "킬 격차 없으면 대등해짐" }
+        ]
+    },
+    "야스오_제드": {
+        winrate: 48,
+        grade: "약간 불리",
+        phases: { early: "lose", mid: "even", late: "win" },
+        summary: "제드의 레벨 3 이후 WEQ 콤보가 야스오에게 매우 위협적입니다. 바람장막으로 제드의 수리검을 막을 수 있지만, 타이밍이 중요합니다.",
+        tags: [{ text: "바람장막 타이밍 핵심", type: "caution" }, { text: "후반 유리", type: "safe" }],
+        tips: [
+            "제드의 W-E-Q 콤보 시 바람장막(W)으로 수리검을 막으세요",
+            "제드 W의 쿨타임(22초 초반)을 외우고 그때 교전하세요",
+            "레벨 6에서 제드 궁 사용 시 바람장막으로 추가 수리검을 차단",
+            "제드 궁 이후 야스오 뒤에서 나타나므로 방향 예측 후 바람장막",
+            "시커의 팔보호구를 빠르게 올리면 생존력이 크게 올라갑니다"
+        ],
+        strategy: [
+            "2코어 이후 야스오가 유리해지니 버티는 것이 핵심",
+            "팀파이트에서 야스오가 훨씬 유리합니다",
+            "제드가 로밍 가면 즉시 핑을 치고 타워를 밀으세요",
+            "정글러와 함께 제드를 잡으면 게임이 쉬워집니다"
+        ],
+        keyTimings: [
+            { time: "레벨 3", desc: "제드 WEQ 주의 시작" },
+            { time: "레벨 6", desc: "제드 올인 최대 주의" },
+            { time: "2코어", desc: "야스오 전투력 역전 시점" }
+        ]
+    },
+    "제드_야스오": {
+        winrate: 52,
+        grade: "약간 유리",
+        phases: { early: "win", mid: "even", late: "lose" },
+        summary: "제드는 야스오를 상대로 레벨 3부터 강력한 포킹이 가능합니다. 하지만 야스오의 바람장막을 조심해야 합니다.",
+        tags: [{ text: "초중반 유리", type: "safe" }, { text: "바람장막 주의", type: "caution" }],
+        tips: [
+            "W-E-Q 콤보를 야스오 바람장막이 없을 때 사용하세요",
+            "바람장막을 유도한 후 쿨타임(26초) 동안 공격적으로 교전",
+            "레벨 6 올인 시 야스오 뒤에서 나타나므로 바람장막 방향 예측",
+            "야스오 방패(패시브)를 평타로 먼저 깨고 콤보를 넣으세요",
+            "야스오가 미니언 사이를 E로 이동할 때 스킬 맞추기 어려우니 대기"
+        ],
+        strategy: [
+            "초중반에 킬을 잡아 아이템 격차를 벌리세요",
+            "야스오가 2코어 이상 모으면 1대1이 어려워집니다",
+            "로밍으로 다른 라인을 터뜨리는 것이 효율적",
+            "후반에는 야스오 팀파이트가 더 강하니 스플릿 푸시 고려"
+        ],
+        keyTimings: [
+            { time: "레벨 3", desc: "W콤보로 체력 깎기 시작" },
+            { time: "레벨 6", desc: "올인 킬 가능 시점" },
+            { time: "20분+", desc: "야스오가 점점 강해짐 주의" }
+        ]
+    },
+    "피오라_말파이트": {
+        winrate: 58,
+        grade: "유리",
+        phases: { early: "win", mid: "win", late: "win" },
+        summary: "피오라는 말파이트의 대표적인 카운터입니다. 급소 찌르기의 퍼센트 체력 데미지와 W의 CC 무효화로 말파이트를 압도합니다.",
+        tags: [{ text: "전 구간 유리", type: "safe" }, { text: "급소 찌르기 활용", type: "safe" }],
+        tips: [
+            "급소(패시브)를 지속적으로 찌르며 퍼센트 체력 데미지를 넣으세요",
+            "말파이트 궁극기 타이밍에 W(리포스트)로 무효화하세요",
+            "말파이트 E(지면 강타)의 공격속도 감소는 피오라에게 큰 영향 없음",
+            "말파이트가 방어적으로 나오면 급소를 찌르며 지속 압박",
+            "궁극기를 사용하면 4방향 급소 모두 터뜨려 큰 데미지+회복"
+        ],
+        strategy: [
+            "말파이트는 팀파이트 챔피언이므로 스플릿 푸시로 압박하세요",
+            "말파이트가 로밍/텔포를 쓰면 탑 타워를 빠르게 밀어세요",
+            "신성한 파괴자 빌드가 말파이트 상대로 최적",
+            "말파이트 궁 리포스트 성공 시 올인으로 킬 가능"
+        ],
+        keyTimings: [
+            { time: "레벨 1", desc: "급소 찌르기로 주도권" },
+            { time: "레벨 6", desc: "궁 리포스트로 킬 가능" },
+            { time: "전 시간", desc: "1대1에서 항상 유리" }
+        ]
+    },
+    "말파이트_피오라": {
+        winrate: 42,
+        grade: "불리",
+        phases: { early: "lose", mid: "lose", late: "lose" },
+        summary: "피오라는 말파이트에게 매우 어려운 상대입니다. 급소 찌르기 퍼센트 데미지와 W 리포스트가 말파이트의 모든 장점을 무력화합니다.",
+        tags: [{ text: "전 구간 불리", type: "danger" }, { text: "팀파이트에 집중", type: "caution" }],
+        tips: [
+            "Q(지진파)로 원거리에서 CS를 챙기며 버티세요",
+            "절대로 피오라와 장기 교전하지 마세요",
+            "궁극기를 피오라가 W를 쓴 직후에 사용하세요 (리포스트 유도 후)",
+            "방어적으로 CS만 챙기고 팀파이트에서 승부하세요",
+            "얼어붙은 심장+가시갑옷 빌드로 최대한 버티세요"
+        ],
+        strategy: [
+            "피오라는 팀파이트가 약하니 팀파이트를 유도하세요",
+            "궁극기를 피오라 외 다른 적 캐리에게 사용하세요",
+            "텔포로 다른 라인에 영향력을 행사하세요",
+            "피오라가 스플릿 시 팀으로 4대5를 유리하게 만드세요"
+        ],
+        keyTimings: [
+            { time: "전 시간", desc: "1대1 피해야 함" },
+            { time: "레벨 6", desc: "궁은 피오라W 이후 사용" },
+            { time: "팀파이트", desc: "말파이트의 유일한 승리 조건" }
+        ]
+    },
+    "나서스_다리우스": {
+        winrate: 42,
+        grade: "불리",
+        phases: { early: "lose", mid: "even", late: "win" },
+        summary: "다리우스는 나서스의 초반 파밍을 극도로 방해합니다. 하지만 나서스가 버티면서 스택을 모으면 후반에 역전할 수 있습니다.",
+        tags: [{ text: "초반 극주의", type: "danger" }, { text: "후반 역전 가능", type: "safe" }],
+        tips: [
+            "레벨 1-6까지 CS 포기하더라도 죽지 않는 것이 최우선",
+            "E(영혼의 불꽃)로 원거리 CS를 챙기되 마나 관리 필수",
+            "다리우스 E 사거리 밖에서 Q 스택을 모으세요",
+            "W(무력화)로 다리우스의 접근을 늦추고 빠지세요",
+            "갈아타기 갑옷 + 체력 포션으로 시작하세요"
+        ],
+        strategy: [
+            "스택 200개(약 15분) 이상 모이면 1대1 가능해집니다",
+            "정글러 갱킹을 요청하되, 다리우스 더블킬 가능성 주의",
+            "삼위일체 완성 후 싸울 수 있습니다",
+            "후반 600+ 스택이면 다리우스 포함 누구든 이길 수 있습니다"
+        ],
+        keyTimings: [
+            { time: "Q 200스택", desc: "전투 참여 가능 시점" },
+            { time: "삼위일체", desc: "1대1 역전 가능" },
+            { time: "25분+", desc: "나서스 후반 최강" }
+        ]
+    },
+    "리븐_가렌": {
+        winrate: 48,
+        grade: "약간 불리",
+        phases: { early: "even", mid: "even", late: "lose" },
+        summary: "가렌의 사일런스가 리븐의 콤보를 끊어 까다로운 상대입니다. 숏 트레이드 위주로 플레이하고 가렌 Q 쿨타임을 활용하세요.",
+        tags: [{ text: "사일런스 주의", type: "danger" }, { text: "숏트레이드 권장", type: "caution" }],
+        tips: [
+            "가렌 Q(사일런스) 사용 후 쿨타임(8초)에 콤보를 넣으세요",
+            "가렌 W(용기) 사용 시 교전을 피하세요 (데미지 감소)",
+            "짧은 교환 후 E로 빠지는 패턴이 핵심",
+            "가렌 패시브 회복을 허용하지 않도록 지속 교전",
+            "흑요석 양날도끼 우선 구매가 효과적"
+        ],
+        strategy: [
+            "레벨 6 이전에 킬을 잡아야 유리해집니다",
+            "가렌이 탱템을 쌓으면 점점 싸우기 어려워집니다",
+            "로밍으로 다른 라인에 영향력을 행사하세요",
+            "후반에는 가렌이 더 유리하니 중반에 승부하세요"
+        ],
+        keyTimings: [
+            { time: "레벨 1-3", desc: "리븐 콤보 데미지 우세" },
+            { time: "레벨 6", desc: "양쪽 모두 킬 가능" },
+            { time: "2코어+", desc: "가렌이 점점 유리해짐" }
+        ]
+    },
+    "가렌_리븐": {
+        winrate: 52,
+        grade: "약간 유리",
+        phases: { early: "even", mid: "even", late: "win" },
+        summary: "가렌의 Q 사일런스가 리븐의 콤보를 효과적으로 끊습니다. 리븐이 접근하면 Q-E로 교환하고 패시브로 회복하세요.",
+        tags: [{ text: "사일런스 활용", type: "safe" }, { text: "후반 유리", type: "safe" }],
+        tips: [
+            "리븐이 Q로 접근하면 Q 사일런스를 걸어 콤보를 끊으세요",
+            "W(용기)를 리븐의 3번째 Q(넉업)에 맞춰 사용하세요",
+            "짧은 교환 후 빠져서 패시브로 회복하세요",
+            "리븐의 E(방어막) 쿨타임에 데미지를 넣으세요",
+            "탱커 아이템을 쌓으면 리븐이 킬하기 어려워집니다"
+        ],
+        strategy: [
+            "리븐의 콤보 패턴을 읽고 사일런스로 끊으세요",
+            "탱커 빌드로 갈수록 리븐이 못 잡습니다",
+            "궁극기 처형으로 리븐의 체력 관리를 방해하세요",
+            "후반에는 탱킹+딜로 팀파이트에서 더 유리합니다"
+        ],
+        keyTimings: [
+            { time: "레벨 1", desc: "Q 사일런스로 교환 유리" },
+            { time: "1코어", desc: "탱템 완성 시 안정" },
+            { time: "후반", desc: "가렌이 확실히 유리" }
+        ]
+    }
+};
+
+// ===== 카운터 추천 데이터 (상대 챔프 → 유리한 챔프 목록) =====
+const COUNTER_PICKS = {
+    "가렌": [
+        { name: "다리우스", wr: 55, reason: "출혈 스택으로 가렌 패시브 회복을 무력화하고 초반 올인이 매우 강합니다.", badges: ["초반 압도", "출혈 카운터"] },
+        { name: "요네", wr: 54, reason: "원거리 교전과 E로 가렌 Q를 피하며 후반 스케일링이 뛰어납니다.", badges: ["기동성 우세", "후반 캐리"] },
+        { name: "케넨", wr: 56, reason: "원거리로 가렌을 일방적으로 견제하고 궁으로 팀파이트에서 압도합니다.", badges: ["원거리 견제", "팀파이트"] },
+        { name: "모데카이저", wr: 53, reason: "AP 데미지로 가렌 방어력을 무시하고 궁으로 1대1을 강제합니다.", badges: ["AP 데미지", "1대1 강제"] },
+        { name: "피오라", wr: 54, reason: "급소 찌르기로 퍼센트 데미지를 넣고 W로 가렌 궁을 무효화할 수 있습니다.", badges: ["퍼센트 딜", "궁 무효화"] }
+    ],
+    "다리우스": [
+        { name: "케넨", wr: 57, reason: "원거리 견제로 다리우스가 접근할 수 없고 궁으로 팀파이트에서 압도합니다.", badges: ["원거리 카운터", "접근 불가"] },
+        { name: "잭스", wr: 53, reason: "E로 다리우스 평타를 회피하고 후반 1대1에서 압도합니다.", badges: ["평타 회피", "후반 강세"] },
+        { name: "요네", wr: 52, reason: "E로 안전하게 교환 후 복귀하고 2코어 이후 1대1이 가능합니다.", badges: ["안전 교환", "후반 캐리"] },
+        { name: "피오라", wr: 55, reason: "W로 다리우스 E를 무효화하고 급소 찌르기로 지속 교전에서 이깁니다.", badges: ["E 무효화", "1대1 최강"] },
+        { name: "케이틀린", wr: 54, reason: "긴 사거리로 다리우스가 절대 접근할 수 없습니다 (비정통 픽).", badges: ["사거리 압도", "카이팅"] }
+    ],
+    "피오라": [
+        { name: "말파이트", wr: 42, reason: "피오라가 유리하지만, 팀파이트에서 말파이트 궁으로 승리할 수 있습니다.", badges: ["팀파이트 승리", "궁 이니시"] },
+        { name: "케넨", wr: 53, reason: "원거리 견제로 피오라 접근을 차단하고 궁으로 팀파이트 기여가 큽니다.", badges: ["원거리 견제", "팀파이트"] },
+        { name: "리븐", wr: 52, reason: "콤보 딜로 짧은 교환에서 유리하고 기동성으로 급소를 안 내줍니다.", badges: ["숏트레이드", "기동성"] },
+        { name: "세트", wr: 53, reason: "초반 올인이 강력하고 W로 피오라 궁 딜을 방어막으로 흡수합니다.", badges: ["초반 올인", "W 방어막"] }
+    ],
+    "야스오": [
+        { name: "르블랑", wr: 55, reason: "폭발적 콤보로 야스오를 순삭하고 W로 안전하게 빠질 수 있습니다.", badges: ["버스트 딜", "안전한 귀환"] },
+        { name: "아칼리", wr: 54, reason: "W 은신으로 야스오 Q를 피하고 근접 전투에서 더 강합니다.", badges: ["은신 회피", "근접 우세"] },
+        { name: "제드", wr: 52, reason: "레벨 3부터 W콤보로 체력을 깎고 레벨 6에서 올인으로 킬 가능합니다.", badges: ["포킹 우세", "레벨6 올인"] },
+        { name: "리븐", wr: 54, reason: "초반 콤보 딜이 야스오보다 강하고 CC로 제압할 수 있습니다.", badges: ["초반 강세", "CC 제압"] }
+    ],
+    "제드": [
+        { name: "야스오", wr: 52, reason: "바람장막으로 수리검을 차단하고 후반 스케일링이 뛰어납니다 (숙련 필요).", badges: ["바람장막", "후반 캐리"] },
+        { name: "럭스", wr: 48, reason: "제드에게 약하지만 Q스턴과 긴 사거리로 안전하게 플레이 가능합니다.", badges: ["사거리", "CC"] },
+        { name: "아리", wr: 53, reason: "궁 기동성으로 제드 궁을 피하고 매혹으로 역킬이 가능합니다.", badges: ["궁 회피", "매혹 역킬"] },
+        { name: "카타리나", wr: 51, reason: "제드 W 쿨타임에 E로 접근해 교환하고 팀파이트에서 더 강합니다.", badges: ["쿨타임 활용", "팀파이트"] }
+    ],
+    "말파이트": [
+        { name: "피오라", wr: 58, reason: "급소 찌르기 퍼센트 데미지와 W 리포스트로 말파이트를 완벽히 카운터합니다.", badges: ["퍼센트 딜", "궁 무효화"] },
+        { name: "나서스", wr: 55, reason: "말파이트가 킬 압박이 없어 자유롭게 Q 스택을 모을 수 있습니다.", badges: ["자유 파밍", "후반 압도"] },
+        { name: "모데카이저", wr: 56, reason: "AP 데미지로 말파이트 방어력이 무의미하고 궁으로 팀파이트 분리 가능.", badges: ["AP 카운터", "궁 분리"] },
+        { name: "요네", wr: 53, reason: "혼합 데미지로 방어력만 쌓는 말파이트에게 유리하고 후반이 강합니다.", badges: ["혼합 데미지", "후반 캐리"] }
+    ],
+    "나서스": [
+        { name: "다리우스", wr: 58, reason: "초반 올인으로 나서스의 스택 쌓기를 완전히 차단합니다.", badges: ["초반 압도", "스택 차단"] },
+        { name: "리븐", wr: 55, reason: "콤보 딜과 기동성으로 나서스를 초반부터 압박합니다.", badges: ["초반 압박", "기동성"] },
+        { name: "세트", wr: 54, reason: "초반 교전이 매우 강해 나서스가 CS를 못 먹습니다.", badges: ["초반 올인", "라인 장악"] },
+        { name: "케넨", wr: 56, reason: "원거리 견제로 나서스가 접근 자체를 못 합니다.", badges: ["원거리 견제", "접근 차단"] }
+    ],
+    "리븐": [
+        { name: "가렌", wr: 52, reason: "Q 사일런스로 리븐 콤보를 끊고 탱커 아이템으로 버텁니다.", badges: ["사일런스", "탱킹"] },
+        { name: "세트", wr: 53, reason: "W 방어막+딜로 리븐 콤보를 받아치고 초반 교전에서 이깁니다.", badges: ["W 받아치기", "초반 강세"] },
+        { name: "말파이트", wr: 53, reason: "방어력 스택으로 리븐 물리 딜을 크게 줄이고 팀파이트에서 기여합니다.", badges: ["방어력 탱킹", "팀파이트"] },
+        { name: "오른", wr: 52, reason: "CC와 탱킹으로 리븐 올인을 견디고 후반 아이템 강화가 강력합니다.", badges: ["CC 다량", "후반 강세"] }
+    ],
+    "세트": [
+        { name: "피오라", wr: 54, reason: "급소 찌르기로 지속 딜이 강하고 W로 세트 W를 무효화합니다.", badges: ["지속 딜", "W 무효화"] },
+        { name: "잭스", wr: 53, reason: "E로 세트 평타를 회피하고 후반에 압도적으로 강합니다.", badges: ["평타 회피", "후반 강세"] },
+        { name: "케넨", wr: 55, reason: "원거리 견제로 세트가 접근할 수 없습니다.", badges: ["원거리 카운터", "접근 차단"] }
+    ],
+    "요네": [
+        { name: "세트", wr: 55, reason: "초반 교전이 압도적이고 요네가 약한 초반을 집중 공략합니다.", badges: ["초반 압도", "올인"] },
+        { name: "리븐", wr: 54, reason: "콤보 딜로 요네 초반을 압도하고 CC로 E 복귀를 차단합니다.", badges: ["초반 강세", "E 차단"] },
+        { name: "르블랑", wr: 55, reason: "폭발적 버스트로 요네를 녹이고 W로 안전하게 빠집니다.", badges: ["버스트 딜", "안전 귀환"] },
+        { name: "아칼리", wr: 53, reason: "W 은신으로 요네 Q3를 피하고 올인 전투에서 이깁니다.", badges: ["은신 회피", "올인 강세"] }
+    ],
+    "모데카이저": [
+        { name: "피오라", wr: 56, reason: "W로 모데카이저 E를 무효화하고 급소 찌르기로 1대1에서 이깁니다.", badges: ["E 무효화", "1대1 최강"] },
+        { name: "잭스", wr: 54, reason: "E로 모데카이저 패시브 평타를 회피하고 후반에 강합니다.", badges: ["패시브 회피", "후반 강세"] },
+        { name: "나서스", wr: 52, reason: "모데카이저 궁에서도 스택이 충분하면 이길 수 있고 후반이 강합니다.", badges: ["궁 안에서 승리", "후반 캐리"] }
+    ],
+    "잭스": [
+        { name: "말파이트", wr: 52, reason: "잭스에게 약하지만 팀파이트에서 궁 이니시로 기여할 수 있습니다.", badges: ["팀파이트", "궁 이니시"] },
+        { name: "케넨", wr: 54, reason: "원거리 견제로 잭스 접근을 차단하고 궁 팀파이트가 강합니다.", badges: ["원거리 견제", "팀파이트"] },
+        { name: "모데카이저", wr: 53, reason: "AP 데미지로 잭스 궁 방어력이 덜 효과적이고 궁으로 분리합니다.", badges: ["AP 데미지", "궁 분리"] }
+    ],
+    "르블랑": [
+        { name: "빅토르", wr: 52, reason: "E 업그레이드 후 푸시력으로 르블랑 로밍을 차단합니다.", badges: ["푸시력", "로밍 차단"] },
+        { name: "카타리나", wr: 51, reason: "르블랑 W 후 쿨타임에 E로 접근해 올인 가능합니다.", badges: ["쿨타임 활용", "올인"] },
+        { name: "아칼리", wr: 53, reason: "W 은신으로 르블랑 콤보를 피하고 올인에서 이깁니다.", badges: ["은신 회피", "올인 강세"] }
+    ],
+    "카타리나": [
+        { name: "제드", wr: 54, reason: "레벨 3부터 W콤보로 카타리나를 압도하고 레벨 6 올인이 강합니다.", badges: ["초반 우세", "올인"] },
+        { name: "아리", wr: 53, reason: "매혹으로 카타리나 궁을 끊고 안전하게 플레이 가능합니다.", badges: ["궁 차단", "CC"] },
+        { name: "럭스", wr: 52, reason: "Q 스턴으로 카타리나 진입을 막고 궁으로 후방에서 딜합니다.", badges: ["CC 차단", "장거리 딜"] }
+    ],
+    "아칼리": [
+        { name: "가렌", wr: 53, reason: "Q 사일런스로 아칼리 콤보를 끊고 E로 은신 영역 안에서도 딜합니다.", badges: ["사일런스", "은신 대응"] },
+        { name: "세트", wr: 54, reason: "초반 올인이 매우 강하고 W로 아칼리 딜을 받아칩니다.", badges: ["초반 올인", "W 카운터"] }
+    ],
+    "아리": [
+        { name: "제드", wr: 54, reason: "레벨 6 올인으로 아리를 압도하고 아리 궁보다 더 강한 킬 압박입니다.", badges: ["올인 강세", "킬 압박"] },
+        { name: "아칼리", wr: 53, reason: "W 은신으로 아리 E를 피하고 올인 전투에서 이깁니다.", badges: ["매혹 회피", "올인"] },
+        { name: "카타리나", wr: 52, reason: "E 순간이동으로 아리 스킬을 피하고 팀파이트 기여도가 높습니다.", badges: ["스킬 회피", "팀파이트"] }
+    ],
+    "럭스": [
+        { name: "제드", wr: 57, reason: "기동성으로 럭스 스킬을 피하고 레벨 6 올인으로 즉사시킵니다.", badges: ["올인 킬", "스킬 회피"] },
+        { name: "아칼리", wr: 56, reason: "W 은신으로 럭스 Q를 피하고 접근 후 올인으로 킬합니다.", badges: ["은신 접근", "올인"] },
+        { name: "르블랑", wr: 55, reason: "W로 럭스 Q를 피하고 폭발적 콤보로 순삭합니다.", badges: ["기동성", "버스트 딜"] },
+        { name: "카타리나", wr: 54, reason: "E로 럭스 뒤로 순간이동해 스킬을 무력화합니다.", badges: ["접근 용이", "스킬 무력화"] }
+    ],
+    "카이사": [
+        { name: "케이틀린", wr: 55, reason: "긴 사거리로 카이사가 진화 전까지 CS를 못 먹게 합니다.", badges: ["사거리 압도", "초반 견제"] },
+        { name: "진", wr: 53, reason: "W+4번째 탄환으로 카이사를 견제하고 궁으로 팀파이트 기여합니다.", badges: ["견제 우세", "유틸리티"] }
+    ],
+    "징크스": [
+        { name: "케이틀린", wr: 56, reason: "초반 사거리 차이로 징크스를 압도하고 타워 플레이팅을 가져갑니다.", badges: ["초반 압도", "사거리"] },
+        { name: "진", wr: 53, reason: "4번째 탄환과 W로 징크스를 초반에 압박합니다.", badges: ["초반 견제", "CC"] }
+    ],
+    "이즈리얼": [
+        { name: "바루스", wr: 53, reason: "온힛 딜과 궁으로 이즈리얼을 견제하고 팀파이트 기여가 큽니다.", badges: ["온힛 딜", "궁 이니시"] },
+        { name: "징크스", wr: 52, reason: "후반 스케일링이 이즈리얼보다 훨씬 강하고 팀파이트 DPS가 높습니다.", badges: ["후반 강세", "DPS"] }
+    ]
+};
+
+// 자동 생성 상성 분석 (데이터에 없는 매치업용)
+function generateMatchup(myChamp, enemyChamp) {
+    const my = CHAMPIONS[myChamp];
+    const enemy = CHAMPIONS[enemyChamp];
+    if (!my || !enemy || !my.power || !enemy.power) return null;
+
+    const earlyDiff = my.power.early - enemy.power.early;
+    const midDiff = my.power.mid - enemy.power.mid;
+    const lateDiff = my.power.late - enemy.power.late;
+
+    const getPhase = (diff) => diff >= 2 ? "win" : diff <= -2 ? "lose" : "even";
+    const avgPower = ((my.power.early + my.power.mid + my.power.late) -
+                      (enemy.power.early + enemy.power.mid + enemy.power.late)) / 3;
+    const winrate = Math.round(50 + avgPower * 3.5);
+
+    let grade;
+    if (winrate >= 55) grade = "유리";
+    else if (winrate >= 52) grade = "약간 유리";
+    else if (winrate >= 48) grade = "대등";
+    else if (winrate >= 45) grade = "약간 불리";
+    else grade = "불리";
+
+    const tags = [];
+    if (my.power.early > enemy.power.early + 1) tags.push({ text: "초반 유리", type: "safe" });
+    if (my.power.early < enemy.power.early - 1) tags.push({ text: "초반 주의", type: "danger" });
+    if (my.power.late > enemy.power.late + 1) tags.push({ text: "후반 유리", type: "safe" });
+    if (my.power.late < enemy.power.late - 1) tags.push({ text: "후반 주의", type: "caution" });
+
+    let summary = `${myChamp}(${my.type}) vs ${enemyChamp}(${enemy.type}) 매치업입니다. `;
+    if (winrate > 52) summary += `${myChamp}이(가) 전반적으로 유리한 상성입니다. `;
+    else if (winrate < 48) summary += `${enemyChamp}이(가) 전반적으로 유리한 상성입니다. `;
+    else summary += "비교적 대등한 매치업으로 플레이에 따라 갈립니다. ";
+
+    if (earlyDiff > 0) summary += `초반에는 ${myChamp}이(가) 더 강합니다. `;
+    else if (earlyDiff < 0) summary += `초반에는 ${enemyChamp}이(가) 더 강하므로 주의하세요. `;
+    if (lateDiff > 0) summary += `후반으로 갈수록 ${myChamp}이(가) 유리해집니다.`;
+    else if (lateDiff < 0) summary += `후반으로 갈수록 ${enemyChamp}이(가) 강해지므로 빠르게 끝내세요.`;
+
+    const tips = [];
+    if (enemy.strengths) {
+        enemy.strengths.forEach(s => tips.push(`상대 강점 주의: ${s}`));
+    }
+    if (my.strengths) {
+        my.strengths.forEach(s => tips.push(`내 강점 활용: ${s}`));
+    }
+    if (enemy.weaknesses) {
+        enemy.weaknesses.forEach(w => tips.push(`상대 약점 공략: ${w}`));
+    }
+
+    const strategy = [];
+    if (my.spikes) my.spikes.forEach(s => strategy.push(`내 파워 스파이크: ${s}`));
+    if (enemy.spikes) enemy.spikes.forEach(s => strategy.push(`상대 파워 스파이크 주의: ${s}`));
+
+    const keyTimings = [];
+    if (earlyDiff >= 2) keyTimings.push({ time: "초반", desc: `${myChamp}이(가) 주도권을 잡을 수 있는 시간` });
+    else if (earlyDiff <= -2) keyTimings.push({ time: "초반", desc: `${enemyChamp}이(가) 강한 시간대, 버티기` });
+    if (my.spikes && my.spikes[0]) keyTimings.push({ time: my.spikes[0].split("(")[0].trim(), desc: my.spikes[0] });
+    if (lateDiff >= 2) keyTimings.push({ time: "후반", desc: `${myChamp}이(가) 확실히 강해지는 시점` });
+
+    return {
+        winrate: Math.max(30, Math.min(70, winrate)),
+        grade,
+        phases: { early: getPhase(earlyDiff), mid: getPhase(midDiff), late: getPhase(lateDiff) },
+        summary,
+        tags: tags.length ? tags : [{ text: grade, type: winrate >= 50 ? "safe" : "caution" }],
+        tips: tips.length ? tips : ["상대 챔피언의 스킬 쿨타임을 파악하고 교전하세요", "CS를 놓치지 않고 아이템 차이를 만드세요"],
+        strategy: strategy.length ? strategy : ["파워 스파이크 시점에 적극적으로 교전하세요"],
+        keyTimings: keyTimings.length ? keyTimings : [{ time: "레벨 6", desc: "궁극기 활용 시점" }]
+    };
+}
+
+// ===== UI 로직 =====
+const champNames = Object.keys(CHAMPIONS);
+let selectedMy = "";
+let selectedEnemy = "";
+
+function setupDropdown(inputId, dropdownId, portraitId, onSelect) {
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(dropdownId);
+
+    input.addEventListener("input", () => {
+        const val = input.value.trim().toLowerCase();
+        dropdown.innerHTML = "";
+        if (!val) { dropdown.classList.remove("show"); return; }
+
+        const matches = champNames.filter(n => n.toLowerCase().includes(val));
+        if (matches.length === 0) { dropdown.classList.remove("show"); return; }
+
+        matches.forEach(name => {
+            const item = document.createElement("div");
+            item.className = "dropdown-item";
+            item.textContent = `${CHAMPIONS[name].icon} ${name} (${CHAMPIONS[name].role})`;
+            item.addEventListener("click", () => {
+                input.value = name;
+                dropdown.classList.remove("show");
+                document.getElementById(portraitId).textContent = CHAMPIONS[name].icon;
+                onSelect(name);
+                updateButton();
+            });
+            dropdown.appendChild(item);
+        });
+        dropdown.classList.add("show");
+    });
+
+    input.addEventListener("focus", () => {
+        if (input.value.trim()) input.dispatchEvent(new Event("input"));
+        else {
+            dropdown.innerHTML = "";
+            champNames.forEach(name => {
+                const item = document.createElement("div");
+                item.className = "dropdown-item";
+                item.textContent = `${CHAMPIONS[name].icon} ${name} (${CHAMPIONS[name].role})`;
+                item.addEventListener("click", () => {
+                    input.value = name;
+                    dropdown.classList.remove("show");
+                    document.getElementById(portraitId).textContent = CHAMPIONS[name].icon;
+                    onSelect(name);
+                    updateButton();
+                });
+                dropdown.appendChild(item);
+            });
+            dropdown.classList.add("show");
+        }
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(`#${inputId}`) && !e.target.closest(`#${dropdownId}`)) {
+            dropdown.classList.remove("show");
+        }
+    });
+}
+
+function updateButton() {
+    document.getElementById("analyzeBtn").disabled = !(selectedMy && selectedEnemy);
+}
+
+setupDropdown("myChamp", "myDropdown", "myPortrait", (name) => { selectedMy = name; });
+setupDropdown("enemyChamp", "enemyDropdown", "enemyPortrait", (name) => { selectedEnemy = name; });
+
+document.getElementById("analyzeBtn").addEventListener("click", analyze);
+
+function analyze() {
+    if (!selectedMy || !selectedEnemy) return;
+    if (selectedMy === selectedEnemy) {
+        alert("같은 챔피언끼리는 비교할 수 없습니다!");
+        return;
+    }
+
+    const key = `${selectedMy}_${selectedEnemy}`;
+    let data = MATCHUPS[key] || generateMatchup(selectedMy, selectedEnemy);
+
+    if (!data) {
+        alert("해당 챔피언의 데이터가 부족합니다.");
+        return;
+    }
+
+    const area = document.getElementById("resultArea");
+    area.classList.add("show");
+
+    // Title
+    document.getElementById("resultTitle").textContent =
+        `${CHAMPIONS[selectedMy].icon} ${selectedMy}  vs  ${selectedEnemy} ${CHAMPIONS[selectedEnemy].icon}`;
+
+    // Winrate bar
+    document.getElementById("wrMyName").textContent = `${selectedMy} ${data.winrate}%`;
+    document.getElementById("wrEnemyName").textContent = `${100 - data.winrate}% ${selectedEnemy}`;
+    document.getElementById("wrFill").style.width = data.winrate + "%";
+    document.getElementById("wrFill").textContent = data.winrate + "%";
+
+    const gradeEl = document.getElementById("matchupGrade");
+    gradeEl.textContent = `상성 등급: ${data.grade}`;
+    gradeEl.style.color = data.winrate >= 52 ? "#4ade80" : data.winrate >= 48 ? "#fbbf24" : "#f87171";
+
+    // Timeline
+    const tlEl = document.getElementById("timeline");
+    const phaseNames = { early: "초반 (1-10분)", mid: "중반 (10-25분)", late: "후반 (25분+)" };
+    const phaseLabels = { win: "유리", lose: "불리", even: "대등" };
+    const phaseClasses = { win: "phase-win", lose: "phase-lose", even: "phase-even" };
+    tlEl.innerHTML = "";
+    for (const [phase, result] of Object.entries(data.phases)) {
+        tlEl.innerHTML += `<div class="timeline-phase ${phaseClasses[result]}">
+            <div class="phase-name">${phaseNames[phase]}</div>
+            <div class="phase-result">${phaseLabels[result]}</div>
+        </div>`;
+    }
+
+    // Key timings
+    const ktEl = document.getElementById("keyTimes");
+    ktEl.innerHTML = "";
+    if (data.keyTimings) {
+        data.keyTimings.forEach(kt => {
+            ktEl.innerHTML += `<div class="key-time-card">
+                <div class="time">${kt.time}</div>
+                <div class="desc">${kt.desc}</div>
+            </div>`;
+        });
+    }
+
+    // Summary + tags
+    document.getElementById("matchupSummary").textContent = data.summary;
+    const tagsEl = document.getElementById("matchupTags");
+    tagsEl.innerHTML = "";
+    if (data.tags) {
+        data.tags.forEach(t => {
+            const cls = t.type === "danger" ? "tag-danger" : t.type === "safe" ? "tag-safe" : "tag-caution";
+            tagsEl.innerHTML += `<span class="danger-tag ${cls}">${t.text}</span> `;
+        });
+    }
+
+    // Tips
+    const tipsEl = document.getElementById("tipsList");
+    tipsEl.innerHTML = "";
+    data.tips.forEach(tip => {
+        tipsEl.innerHTML += `<li>${tip}</li>`;
+    });
+
+    // Strategy
+    const stratEl = document.getElementById("strategyList");
+    stratEl.innerHTML = "";
+    data.strategy.forEach(s => {
+        stratEl.innerHTML += `<li>${s}</li>`;
+    });
+
+    // Recommend counter picks
+    renderRecommendations(selectedEnemy);
+
+    area.scrollIntoView({ behavior: "smooth" });
+}
+
+function getAutoCounters(enemyName) {
+    const enemy = CHAMPIONS[enemyName];
+    if (!enemy || !enemy.power) return [];
+    const results = [];
+    for (const [name, champ] of Object.entries(CHAMPIONS)) {
+        if (name === enemyName || !champ.power) continue;
+        const earlyDiff = champ.power.early - enemy.power.early;
+        const midDiff = champ.power.mid - enemy.power.mid;
+        const lateDiff = champ.power.late - enemy.power.late;
+        const avg = (earlyDiff + midDiff + lateDiff) / 3;
+        const wr = Math.round(50 + avg * 3.5);
+        if (wr < 52) continue;
+
+        const badges = [];
+        if (earlyDiff >= 2) badges.push("초반 강세");
+        if (lateDiff >= 2) badges.push("후반 강세");
+        if (champ.type.includes("암살자") && enemy.type.includes("마법사")) badges.push("암살 카운터");
+        if (champ.type.includes("탱커") && enemy.type.includes("전사")) badges.push("탱킹 우세");
+        if (badges.length === 0) badges.push("스탯 유리");
+
+        const reasons = [];
+        if (champ.strengths) reasons.push(champ.strengths[0]);
+        if (enemy.weaknesses) reasons.push(`상대 약점: ${enemy.weaknesses[0]}`);
+
+        results.push({
+            name,
+            wr: Math.min(60, wr),
+            reason: reasons.join(". ") + ".",
+            badges,
+            role: champ.role
+        });
+    }
+    results.sort((a, b) => b.wr - a.wr);
+    return results.slice(0, 8);
+}
+
+function renderRecommendations(enemyName) {
+    const section = document.getElementById("recommendSection");
+    const grid = document.getElementById("recommendGrid");
+    const sub = document.getElementById("recommendSub");
+    const title = document.getElementById("recommendTitle");
+    const filterEl = document.getElementById("roleFilter");
+
+    // Merge manual + auto counters, dedup by name
+    const manual = (COUNTER_PICKS[enemyName] || []).map(c => ({ ...c, role: CHAMPIONS[c.name]?.role || "?" }));
+    const auto = getAutoCounters(enemyName);
+    const seen = new Set(manual.map(c => c.name));
+    const merged = [...manual];
+    for (const c of auto) {
+        if (!seen.has(c.name)) { merged.push(c); seen.add(c.name); }
+    }
+    merged.sort((a, b) => b.wr - a.wr);
+
+    if (merged.length === 0) {
+        section.style.display = "none";
+        return;
+    }
+
+    section.style.display = "block";
+    title.textContent = `${enemyName} 상대로 유리한 챔피언 추천`;
+    sub.textContent = `${enemyName}을(를) 카운터할 수 있는 챔피언들입니다. 클릭하면 해당 매치업으로 분석합니다.`;
+
+    // Role filter
+    const roles = [...new Set(merged.map(c => c.role))];
+    filterEl.innerHTML = "";
+    const allBtn = document.createElement("button");
+    allBtn.className = "role-btn active";
+    allBtn.textContent = "전체";
+    allBtn.addEventListener("click", () => {
+        document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
+        allBtn.classList.add("active");
+        renderCards(merged, enemyName);
+    });
+    filterEl.appendChild(allBtn);
+    roles.forEach(role => {
+        const btn = document.createElement("button");
+        btn.className = "role-btn";
+        btn.textContent = role;
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderCards(merged.filter(c => c.role === role), enemyName);
+        });
+        filterEl.appendChild(btn);
+    });
+
+    renderCards(merged, enemyName);
+}
+
+function renderCards(list, enemyName) {
+    const grid = document.getElementById("recommendGrid");
+    grid.innerHTML = "";
+    list.forEach(c => {
+        const champ = CHAMPIONS[c.name];
+        if (!champ) return;
+        const wrClass = c.wr >= 55 ? "high" : "mid";
+        const card = document.createElement("div");
+        card.className = "recommend-card";
+        card.innerHTML = `
+            <div class="rc-top">
+                <div class="rc-icon">${champ.icon}</div>
+                <div class="rc-info">
+                    <div class="rc-name">${c.name}</div>
+                    <div class="rc-role">${champ.role} · ${champ.type}</div>
+                </div>
+                <div class="rc-wr ${wrClass}">${c.wr}%</div>
+            </div>
+            <div class="rc-reason">${c.reason}</div>
+            <div class="rc-badges">${c.badges.map(b => `<span class="rc-badge">${b}</span>`).join("")}</div>
+        `;
+        card.style.cursor = "pointer";
+        card.addEventListener("click", () => {
+            document.getElementById("myChamp").value = c.name;
+            document.getElementById("myPortrait").textContent = champ.icon;
+            selectedMy = c.name;
+            updateButton();
+            analyze();
+        });
+        grid.appendChild(card);
+    });
+}
+
+// Scroll top button
+window.addEventListener("scroll", () => {
+    document.getElementById("scrollTop").style.display = window.scrollY > 300 ? "block" : "none";
+});
+</script>
+</body>
+</html>
